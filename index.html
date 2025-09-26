@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kino Ticket Designer</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- jQuery & jQuery UI -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar Tools -->
+    <aside class="panel">
+      <h2>Werkzeuge</h2>
+      <div class="tools">
+        <div class="group">
+          <h3>Elemente hinzufügen</h3>
+          <div class="row">
+            <button class="btn" id="addText">Text</button>
+            <button class="btn" id="addLabelValue">Label + Wert</button>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn" id="addRect">Rechteck</button>
+            <button class="btn" id="addCircle">Kreis</button>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <label class="btn" for="imgInput">Bild</label>
+            <input id="imgInput" type="file" accept="image/*" style="display:none" />
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>Auswahl • Stil</h3>
+          <div class="row">
+            <div class="field"><label>Textfarbe</label><input type="color" id="textColor" value="#e5e7eb"></div>
+            <div class="field"><label>Füllfarbe</label><input type="color" id="fillColor" value="#1f2937"></div>
+            <div class="field"><label>Rahmen</label><input type="color" id="strokeColor" value="#7c3aed"></div>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <div class="field" style="width:50%"><label>Rahmen-Breite</label><input type="number" id="strokeWidth" value="0" min="0" max="12"></div>
+            <div class="field" style="width:50%"><label>Rundung</label><input type="number" id="radius" value="8" min="0" max="80"></div>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn" id="bringFront">Nach vorn</button>
+            <button class="btn" id="sendBack">Nach hinten</button>
+            <button class="btn" id="dup">Duplizieren</button>
+            <button class="btn" id="del">Löschen</button>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>Platzhalter einfügen</h3>
+          <div class="row">
+            <select id="phSelect">
+              <option value="{{REFNR}}">Referenznr</option>
+              <option value="{{SEAT}}">Sitzplatz</option>
+              <option value="{{MOVIE}}">Filmtitel</option>
+              <option value="{{DATE}}">Datum</option>
+              <option value="{{TIME}}">Zeit</option>
+              <option value="{{HALL}}">Saal</option>
+              <option value="{{PRICE}}">Preis</option>
+              <option value="{{QR_DATA}}">QR-Daten</option>
+            </select>
+            <button class="btn" id="insertPh">In Text einfügen</button>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>Hintergrund</h3>
+          <div class="row">
+            <div class="field" style="width:100%"><label>Farbe</label><input type="color" id="bgColor" value="#111827"></div>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <div class="field" style="width:100%"><label>Optionales Bild (cover)</label><input id="bgImg" type="file" accept="image/*"></div>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>Export</h3>
+          <div class="row">
+            <button class="btn primary" id="exportHtml">Als HTML exportieren</button>
+          </div>
+          <textarea id="exportOut" placeholder="Exportierter HTML-Code erscheint hier…"></textarea>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="left">
+          <button class="btn" id="presetClean">Vorlage neu</button>
+        </div>
+        <div class="right">
+          <span style="color:#94a3b8;font-size:12px">Shift = Snap (Drehen/Bewegen)</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="panel">
+      <h2>Ticket-Canvas</h2>
+      <div class="canvasWrap">
+        <div id="canvas">
+          <div class="snapHint" id="snapHint">Snap aktiv</div>
+          <div class="badge">Kino Ticket</div>
+          <!-- Default preset -->
+          <div class="preset-grid" id="preset">
+            <div class="card">
+              <div class="label">Film</div>
+              <div class="value" contenteditable="true">{{MOVIE}}</div>
+              <div style="display:flex; gap:16px; margin-top:10px">
+                <div><span class="label">Datum</span><div class="value" contenteditable="true">{{DATE}}</div></div>
+                <div><span class="label">Zeit</span><div class="value" contenteditable="true">{{TIME}}</div></div>
+                <div><span class="label">Saal</span><div class="value" contenteditable="true">{{HALL}}</div></div>
+                <div><span class="label">Sitz</span><div class="value" contenteditable="true">{{SEAT}}</div></div>
+              </div>
+            </div>
+            <div class="card" style="width:260px; display:grid; gap:8px; align-content:start">
+              <div><span class="label">Referenz</span><div class="value" contenteditable="true">{{REFNR}}</div></div>
+              <div><span class="label">Preis</span><div class="value" contenteditable="true">{{PRICE}}</div></div>
+              <div class="shape" style="height:140px; display:grid; place-items:center; font-weight:700">[ QR {{QR_DATA}} ]</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
